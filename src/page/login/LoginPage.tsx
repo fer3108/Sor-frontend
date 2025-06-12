@@ -1,0 +1,143 @@
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+
+import { useForm } from "@tanstack/react-form";
+import { loginFormSchema } from "./validationSchema";
+import { fetchLoginData } from "@/data/login";
+import { useState } from "react";
+import { Alert, AlertTitle } from "@/components/ui/alert";
+import { AlertCircleIcon } from "lucide-react";
+import { useNavigate } from "react-router";
+
+export default function LoginPage() {
+  const [alert, setAlert] = useState("");
+  const navigate = useNavigate();
+
+  const form = useForm({
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+    validators: {
+      onChange: loginFormSchema,
+    },
+    onSubmit: async ({ value }) => {
+      //we consult the API
+      const res = await fetchLoginData(value.email, value.password);
+      if (!res.success) {
+        setAlert(res.msg);
+        return;
+      }
+      navigate("/");
+    },
+  });
+
+  return (
+    <div className="min-h-screen w-full flex items-center justify-center bg-background p-4">
+      <div className="mx-auto w-full max-w-md space-y-6">
+        <div className="text-center">
+          <div className="mx-auto mb-6 flex justify-center">
+            <div className="rounded-lg bg-primary p-4">
+              <h1 className="text-3xl font-bold text-primary-foreground">
+                MiEmpresa
+              </h1>
+            </div>
+          </div>
+
+          <h2 className="text-2xl font-bold text-foreground">Iniciar sesión</h2>
+          <p className="text-muted-foreground mt-2">
+            Ingresa tus credenciales para acceder
+          </p>
+        </div>
+
+        <form
+          className="space-y-4"
+          onSubmit={(e) => {
+            e.preventDefault();
+            form.handleSubmit();
+          }}
+        >
+          <form.Field
+            name="email"
+            children={(field) => (
+              <div className="space-y-2">
+                <Label htmlFor="email" className="text-foreground">
+                  Correo electrónico
+                </Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="tu@email.com"
+                  className="border-border focus:ring-ring"
+                  name={field.name}
+                  value={field.state.value}
+                  onChange={(e) => field.handleChange(e.target.value)}
+                />
+                {field.state.meta.errors.length > 0 &&
+                  field.state.meta.isTouched && (
+                    <span className="text-red-500 text-xs">
+                      *{field.state.meta.errors[0]?.message}
+                    </span>
+                  )}
+              </div>
+            )}
+          />
+
+          <form.Field
+            name="password"
+            children={(field) => (
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="password" className="text-foreground">
+                    Contraseña
+                  </Label>
+                  <a
+                    href="/recuperar-contrasena"
+                    className="text-sm font-medium text-primary hover:underline"
+                  >
+                    ¿Olvidaste tu contraseña?
+                  </a>
+                </div>
+                <Input
+                  id="password"
+                  type="password"
+                  placeholder="********"
+                  className="border-border focus:ring-ring"
+                  name={field.name}
+                  value={field.state.value}
+                  onChange={(e) => field.handleChange(e.target.value)}
+                />
+                {field.state.meta.errors.length > 0 &&
+                  field.state.meta.isTouched && (
+                    <span className="text-red-500 text-xs">
+                      *{field.state.meta.errors[0]?.message}
+                    </span>
+                  )}
+              </div>
+            )}
+          />
+          {alert && (
+            <Alert variant="destructive" className="border-red-500 border-t-4">
+              <AlertCircleIcon />
+              <AlertTitle>{alert}</AlertTitle>
+            </Alert>
+          )}
+
+          <form.Subscribe
+            selector={(state) => [state.canSubmit, state.isSubmitting]}
+            children={([canSubmit, isSubmitting]) => (
+              <Button
+                type="submit"
+                disabled={!canSubmit}
+                className="w-full bg-primary hover:bg-primary/90"
+              >
+                {isSubmitting ? "...Verificando" : "Ingresar"}
+              </Button>
+            )}
+          />
+        </form>
+      </div>
+    </div>
+  );
+}
