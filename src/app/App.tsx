@@ -1,14 +1,14 @@
 import { BrowserRouter, Route, Routes } from "react-router";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
-import RootLayout from "@/RootLayout";
-import HomePage from "@/page/home/HomePage";
-import RouteTwoPage from "@/page/routeTwo/RouteTwoPage";
-import RouteThreePage from "@/page/routeThree/RouteThreePage";
-import RouteFourPage from "@/page/routeFour/RouteFourPage";
-import RouteFivePage from "@/page/routeFive/RouteFivePage";
-import RouteSixPage from "@/page/routeSix/RouteSixPage";
-import LoginPage from "@/page/login/LoginPage";
+import RootLayout from "@/app/RootLayout";
+import HomePage from "@/infrastructure/page/home/HomePage";
+import RouteThreePage from "@/infrastructure/page/routeThree/RouteThreePage";
+import RouteFourPage from "@/infrastructure/page/routeFour/RouteFourPage";
+import RouteFivePage from "@/infrastructure/page/routeFive/RouteFivePage";
+import RouteSixPage from "@/infrastructure/page/routeSix/RouteSixPage";
+import LoginPage from "@/infrastructure/page/login/LoginPage";
+import UserPage from "@/features/users/insfrastructure/framework/UserPage";
 
 export default function App() {
   const queryClient = new QueryClient();
@@ -19,7 +19,7 @@ export default function App() {
         <Routes>
           <Route element={<RootLayout />}>
             <Route path="/" element={<HomePage />} />
-            <Route path="/routeTwo" element={<RouteTwoPage />} />
+            <Route path="/user" element={<UserPage />} />
             <Route path="/routeThree" element={<RouteThreePage />} />
             <Route path="/routeFour" element={<RouteFourPage />} />
             <Route path="/routeFive" element={<RouteFivePage />} />

@@ -4,7 +4,7 @@ import { Label } from "@/components/ui/label";
 
 import { useForm } from "@tanstack/react-form";
 import { loginFormSchema } from "./validationSchema";
-import { fetchLoginData } from "@/data/login";
+import { fetchLoginData } from "../../../data/login";
 import { useState } from "react";
 import { Alert, AlertTitle } from "@/components/ui/alert";
 import { AlertCircleIcon } from "lucide-react";

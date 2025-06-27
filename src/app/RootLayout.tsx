@@ -12,7 +12,7 @@ import {
   SidebarMenuSubItem,
   SidebarProvider,
   SidebarTrigger,
-} from "./components/ui/sidebar";
+} from "@/components/ui/sidebar";
 import {
   ChevronDown,
   FileSearch,
@@ -22,16 +22,16 @@ import {
   User,
   UserPlus,
 } from "lucide-react";
-import { Separator } from "./components/ui/separator";
+import { Separator } from "@/components/ui/separator";
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import UserCard from "./components/user-card";
+import UserCard from "@/components/user-card";
 import { useQuery } from "@tanstack/react-query";
 
-import { fetchUserData } from "./data/login";
+import { fetchUserData } from "../data/login";
 
 const menuContent = [
   {
@@ -42,7 +42,7 @@ const menuContent = [
   {
     name: "menuButton 2",
     icon: User,
-    link: "/routeTwo",
+    link: "/user",
   },
   {
     name: "WhitSubmenu 1",
