@@ -3,12 +3,15 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 import { useForm } from "@tanstack/react-form";
-import { loginFormSchema } from "./validationSchema";
-import { fetchLoginData } from "../../../data/login";
+import { loginSchema } from "../loginSchema";
 import { useState } from "react";
 import { Alert, AlertTitle } from "@/components/ui/alert";
 import { AlertCircleIcon } from "lucide-react";
 import { useNavigate } from "react-router";
+
+import { AuthServices } from "../../application/AuthServices";
+import { TokenStorageRepositoryImp } from "@/features/core/infrastructure/TokenStorageRepositoryImp";
+import { AuthRespositoryImp } from "../AuthRepositoryImp";
 
 export default function LoginPage() {
   const [alert, setAlert] = useState("");
@@ -16,17 +19,22 @@ export default function LoginPage() {
 
   const form = useForm({
     defaultValues: {
-      email: "",
+      username: "",
       password: "",
     },
     validators: {
-      onChange: loginFormSchema,
+      onChange: loginSchema,
     },
     onSubmit: async ({ value }) => {
-      //we consult the API
-      const res = await fetchLoginData(value.email, value.password);
-      if (!res.success) {
-        setAlert(res.msg);
+      const authRepo = new AuthRespositoryImp();
+      const tokenStorageRepo = new TokenStorageRepositoryImp();
+      const service = new AuthServices(authRepo, tokenStorageRepo);
+
+      const result = await service.login(value);
+
+      console.log("de page", result);
+      if (result.status === "fail") {
+        setAlert(result.message);
         return;
       }
       navigate("/");
@@ -57,18 +65,19 @@ export default function LoginPage() {
             e.preventDefault();
             form.handleSubmit();
           }}
+          noValidate
         >
           <form.Field
-            name="email"
+            name="username"
             children={(field) => (
               <div className="space-y-2">
-                <Label htmlFor="email" className="text-foreground">
-                  Correo electrónico
+                <Label htmlFor="username" className="text-foreground">
+                  Nombre de Usuario{" "}
                 </Label>
                 <Input
-                  id="email"
-                  type="email"
-                  placeholder="tu@email.com"
+                  id="username"
+                  type="text"
+                  placeholder="Nombre de Usuario"
                   className="border-border focus:ring-ring"
                   name={field.name}
                   value={field.state.value}

@@ -20,31 +20,19 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { useForm } from "@tanstack/react-form";
 import { useState } from "react";
-import { defaultUserValues, newUserSchema } from "../../user.controller";
+import { newUserSchema } from "../../user.controller";
 import { Toast } from "@/components/ui/toast";
-import { UserRepositoryImpl } from "../../user.repositoryImpl";
+import { UserRepositoryImp } from "../../repositories/UserRepositoryImp";
 
 import type { ApiResponse } from "@/shared/dtos/api-response.dto";
-import type { User } from "@/features/users/domain/user.entity";
-import { UserService } from "@/features/users/application/user.service";
+import { UserService } from "@/features/users/application/UserService";
+import { TokenStorageRepositoryImp } from "@/features/core/infrastructure/TokenStorageRepositoryImp";
+import type { UserEntity } from "@/features/users/domain/entities/UserEntity";
 
 export default function ModalNewUser() {
   const [open, setOpen] = useState(false);
   const [showToast, setShowToast] = useState(false);
-  const [responseApi, setResponseApi] = useState<ApiResponse<User>>();
-
-  const handleFormSubmit = async ({ value }: any) => {
-    const repo = new UserRepositoryImpl();
-    const useCase = new UserService(repo);
-    const result = await useCase.createUser(value);
-
-    if (!result) {
-      setResponseApi({ success: false, message: "algo salio mal" });
-    }
-    setResponseApi(result);
-    console.log("Form submitted with values:", value);
-    setShowToast(true);
-  };
+  const [responseApi, setResponseApi] = useState<ApiResponse<UserEntity>>();
 
   const handleDialogChange = (isOpen: boolean) => {
     setOpen(isOpen);
@@ -54,9 +42,16 @@ export default function ModalNewUser() {
   };
 
   const form = useForm({
-    defaultValues: defaultUserValues,
-    validators: { onChange: newUserSchema },
-    onSubmit: handleFormSubmit,
+    defaultValues: { username: "", email: "", password: "", roles: [""] },
+    validators: {
+      onChange: newUserSchema,
+    },
+    onSubmit: async ({ value }) => {
+      const userRepo = new UserRepositoryImp();
+      const tokenStorageRepo = new TokenStorageRepositoryImp();
+      /* const servicio = new UserService(userRepo, tokenStorageRepo); */
+      console.log("modal ", value);
+    },
   });
 
   return (
@@ -80,12 +75,40 @@ export default function ModalNewUser() {
           className="flex flex-col gap-4"
           onSubmit={(e) => {
             e.preventDefault();
+            e.stopPropagation();
             form.handleSubmit();
           }}
-          autoComplete="off"
+          noValidate
         >
-          <div className="grid gap-3">
-            <Label htmlFor="email">Correo Electronico</Label>
+          <div className="grid gap-4">
+            <form.Field
+              name="username"
+              children={(field) => (
+                <>
+                  <Label htmlFor="username" className="font-semibold">
+                    Nombre de Usuario
+                  </Label>
+                  <Input
+                    id="username"
+                    type="text"
+                    placeholder="Nombre de Usuario"
+                    name={field.name}
+                    value={field.state.value}
+                    onChange={(e) => field.handleChange(e.target.value)}
+                  />
+                  {field.state.meta.errors.length > 0 &&
+                    field.state.meta.isTouched && (
+                      <span className="text-red-500 text-xs">
+                        *{field.state.meta.errors[0]?.message}
+                      </span>
+                    )}
+                </>
+              )}
+            />
+
+            <Label htmlFor="email" className="font-semibold">
+              Correo Electronico
+            </Label>
             <form.Field
               name="email"
               children={(field) => (
@@ -107,22 +130,22 @@ export default function ModalNewUser() {
                 </>
               )}
             />
-          </div>
-          <div className="grid gap-3">
-            <Label htmlFor="username-1">Rol del Usuario</Label>
+
+            <Label htmlFor="password" className="font-semibold">
+              Contraseña
+            </Label>
             <form.Field
-              name="role"
+              name="password"
               children={(field) => (
                 <>
-                  <Select onValueChange={field.handleChange}>
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Seleccione un Rol" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="admin">Administrador</SelectItem>
-                      <SelectItem value="user">Usuario</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <Input
+                    id="password"
+                    type="text"
+                    placeholder="Contraseña"
+                    name={field.name}
+                    value={field.state.value}
+                    onChange={(e) => field.handleChange(e.target.value)}
+                  />
                   {field.state.meta.errors.length > 0 &&
                     field.state.meta.isTouched && (
                       <span className="text-red-500 text-xs">
@@ -133,6 +156,38 @@ export default function ModalNewUser() {
               )}
             />
           </div>
+          <div className="grid gap-3">
+            <Label htmlFor="roles" className="font-semibold">
+              Rol del Usuario
+            </Label>
+            <form.Field
+              name="roles"
+              children={(field) => (
+                <>
+                  <Select
+                    onValueChange={(value) =>
+                      field.setValue([value.toUpperCase()])
+                    }
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Seleccione un Rol" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="ADMIN">Administrador</SelectItem>
+                      <SelectItem value="USER">Usuario</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  {field.state.meta.errors.length > 0 &&
+                    (field.state.meta.isTouched || form.state.isSubmitted) && (
+                      <span className="text-red-500 text-xs">
+                        *{field.state.meta.errors[0]?.message}
+                      </span>
+                    )}
+                </>
+              )}
+            />
+          </div>
+          <Separator className="my-2" />
           <DialogFooter>
             <DialogClose asChild>
               <Button

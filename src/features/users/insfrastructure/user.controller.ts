@@ -1,12 +1,15 @@
 import { z } from "zod/v4";
-import { UserRole } from "../domain/user.entity";
 
 export const newUserSchema = z.object({
-  email: z.email({ message: "Email no valido" }),
-  role: z.enum(UserRole, { error: "Debe seleccionar un Rol para el usuario" }),
+  username: z.string().min(1, {
+    error: "Nombre de Usuario Necesario",
+  }),
+  email: z.email({ error: "Email no valido" }),
+  password: z.string().min(1, { error: "Contraseña es necesaria" }),
+  roles: z
+    .array(z.string().min(1, { error: "select rol" }))
+    .refine((arr) => arr.every((r) => r !== ""), {
+      message: "Selecciona un rol válido",
+    })
+    .min(1, { error: "Selecciona un Rol" }),
 });
-
-export const defaultUserValues = {
-  email: "admin@admin.com",
-  role: "",
-};

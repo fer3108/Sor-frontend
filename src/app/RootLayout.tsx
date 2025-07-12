@@ -1,4 +1,4 @@
-import { Link, Outlet, useLocation } from "react-router";
+import { Link, Outlet, useLocation, useNavigate } from "react-router";
 import {
   Sidebar,
   SidebarContent,
@@ -30,8 +30,10 @@ import {
 } from "@/components/ui/collapsible";
 import UserCard from "@/components/user-card";
 import { useQuery } from "@tanstack/react-query";
-
-import { fetchUserData } from "../data/login";
+import { UserRepositoryImp } from "@/features/users/insfrastructure/repositories/UserRepositoryImp";
+import { UserService } from "@/features/users/application/UserService";
+import { TokenStorageRepositoryImp } from "@/features/core/infrastructure/TokenStorageRepositoryImp";
+import { useEffect } from "react";
 
 const menuContent = [
   {
@@ -42,21 +44,26 @@ const menuContent = [
   {
     name: "menuButton 2",
     icon: User,
-    link: "/user",
+    link: "/routeFive",
   },
   {
-    name: "WhitSubmenu 1",
+    name: "Usuarios",
     icon: UserPlus,
     submenu: [
       {
-        name: "menuButton 1",
+        name: "Crear Usuario",
         icon: Plus,
-        link: "/routeThree",
+        link: "/user",
       },
       {
-        name: "menuButton 2",
+        name: "Crear Rol",
         icon: FileSearch,
-        link: "/routeFour",
+        link: "/role",
+      },
+      {
+        name: "Crear Permiso",
+        icon: FileSearch,
+        link: "/permission",
       },
     ],
   },
@@ -80,20 +87,32 @@ const menuContent = [
 
 export default function RootLayout() {
   const location = useLocation();
+  const navigate = useNavigate();
 
   const { data, isPending, error } = useQuery({
+    refetchOnWindowFocus: false,
     queryKey: ["obtener"],
-    queryFn: fetchUserData,
+    queryFn: async () => {
+      const userRepo = new UserRepositoryImp();
+      const tokenStorageRepo = new TokenStorageRepositoryImp();
+
+      const servicio = new UserService(userRepo, tokenStorageRepo);
+      const respProfile = await servicio.obteinProfile();
+
+      return respProfile;
+    },
   });
 
-  console.log("data", data);
-  console.log("isPending", isPending);
-  console.log("error", error);
+  useEffect(() => {
+    if (!isPending && (error || data.status !== "success")) {
+      navigate("/login");
+    }
+  }, [error, data, isPending]);
 
   if (isPending) {
     return (
       <div className="flex h-screen items-center justify-center">
-        Cargando...
+        Cargando...asdasd
       </div>
     );
   }
@@ -185,11 +204,8 @@ export default function RootLayout() {
           <SidebarTrigger className="cursor-pointer ml-2" />
           <Separator className="mx-2" orientation="vertical" />
           <UserCard
-            user={{
-              name: "fernando",
-              email: "correo@correo.com",
-              role: "admin",
-            }}
+            name={data?.data?.username || ""}
+            email={data?.data?.email || ""}
           />
         </header>
         <Outlet />

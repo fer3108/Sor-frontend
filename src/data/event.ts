@@ -1,6 +1,9 @@
 import type { ApiResponse } from "@/shared/dtos/api-response.dto";
 import { data } from "./data";
-import type { User, UserRole } from "@/features/users/domain/user.entity";
+import type {
+  User,
+  UserRole,
+} from "@/features/users/domain/entities/UserEntity";
 
 export default async function addUser(newUser: {
   name_user: string;
