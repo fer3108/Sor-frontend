@@ -34,6 +34,8 @@ import { UserRepositoryImp } from "@/features/users/insfrastructure/repositories
 import { UserService } from "@/features/users/application/UserService";
 import { TokenStorageRepositoryImp } from "@/features/core/infrastructure/TokenStorageRepositoryImp";
 import { useEffect } from "react";
+import { useRolesStore } from "@/features/core/infrastructure/stores/useRolesStore";
+import { usePermissionsStore } from "@/features/core/infrastructure/stores/usePersmissionsStore";
 
 const menuContent = [
   {
@@ -97,9 +99,13 @@ export default function RootLayout() {
       const tokenStorageRepo = new TokenStorageRepositoryImp();
 
       const servicio = new UserService(userRepo, tokenStorageRepo);
-      const respProfile = await servicio.obteinProfile();
+      const reqProfile = await servicio.obteinProfile();
+      const reqRoles = await servicio.getRoles();
+      const reqPermissions = await servicio.getPermissions();
 
-      return respProfile;
+      useRolesStore.getState().setRoles(reqRoles.data || []);
+      usePermissionsStore.getState().setPermissions(reqPermissions.data || []);
+      return reqProfile;
     },
   });
 

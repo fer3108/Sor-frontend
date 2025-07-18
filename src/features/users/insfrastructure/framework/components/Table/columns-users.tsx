@@ -1,8 +1,12 @@
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import type { UserEntity } from "@/features/users/domain/entities/UserEntity";
 import type { ColumnDef } from "@tanstack/react-table";
+import { EyeIcon, PencilIcon } from "lucide-react";
 
-export const columnsUsers: ColumnDef<UserEntity>[] = [
+export const columnsUsers = (
+  onEdit: (user: UserEntity) => void
+): ColumnDef<UserEntity>[] => [
   {
     header: "N°",
     cell: ({ row }: { row: { index: number } }) => {
@@ -26,7 +30,7 @@ export const columnsUsers: ColumnDef<UserEntity>[] = [
   {
     header: "Rol del Usuario",
     cell: ({ row }) => {
-      const roles = row.original.roles ?? [];
+      const roles = row.original.roles;
       const name = roles.map((role) => role.name).join(", ");
       return name;
     },
@@ -42,6 +46,30 @@ export const columnsUsers: ColumnDef<UserEntity>[] = [
           {permissions.map((p, index) => (
             <p key={index}>{p.name}</p>
           ))}
+        </div>
+      );
+    },
+  },
+  {
+    header: "Acciones",
+    cell: ({ row }) => {
+      return (
+        <div className="flex gap-2 w-fit">
+          <Button
+            variant="outline"
+            size="icon"
+            className="shadow-sm cursor-pointer"
+            onClick={() => onEdit(row.original)}
+          >
+            <PencilIcon className="text-green-700" />
+          </Button>
+          <Button
+            variant="outline"
+            size="icon"
+            className="shadow-sm cursor-pointer"
+          >
+            <EyeIcon className="text-blue-500" />
+          </Button>
         </div>
       );
     },

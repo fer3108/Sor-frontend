@@ -7,7 +7,7 @@ export class AuthRespositoryImp implements AuthRepository {
     credentials: Credentials
   ): Promise<ApiResponseEntity<{ token: string }>> {
     try {
-      const url = import.meta.env.VITE_API_URL;
+      const url = import.meta.env.VITE_API_URL_V1;
       const response = await fetch(`${url}auth/login`, {
         method: "POST",
         headers: {

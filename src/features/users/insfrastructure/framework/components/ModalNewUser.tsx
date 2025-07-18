@@ -24,15 +24,18 @@ import { newUserSchema } from "../../user.controller";
 import { Toast } from "@/components/ui/toast";
 import { UserRepositoryImp } from "../../repositories/UserRepositoryImp";
 
-import type { ApiResponse } from "@/shared/dtos/api-response.dto";
-import { UserService } from "@/features/users/application/UserService";
 import { TokenStorageRepositoryImp } from "@/features/core/infrastructure/TokenStorageRepositoryImp";
-import type { UserEntity } from "@/features/users/domain/entities/UserEntity";
+import { UserService } from "@/features/users/application/UserService";
+import type { ApiResponseDto } from "../../dtos/ApiResponseDto";
 
-export default function ModalNewUser() {
+export default function ModalNewUser({
+  onUserCreated,
+}: {
+  onUserCreated: () => void;
+}) {
   const [open, setOpen] = useState(false);
   const [showToast, setShowToast] = useState(false);
-  const [responseApi, setResponseApi] = useState<ApiResponse<UserEntity>>();
+  const [responseApi, setResponseApi] = useState<ApiResponseDto>();
 
   const handleDialogChange = (isOpen: boolean) => {
     setOpen(isOpen);
@@ -49,8 +52,15 @@ export default function ModalNewUser() {
     onSubmit: async ({ value }) => {
       const userRepo = new UserRepositoryImp();
       const tokenStorageRepo = new TokenStorageRepositoryImp();
-      /* const servicio = new UserService(userRepo, tokenStorageRepo); */
-      console.log("modal ", value);
+      const servicio = new UserService(userRepo, tokenStorageRepo);
+      const respServicio = await servicio.createUser(value);
+      console.log("modal ", respServicio);
+      setResponseApi(respServicio);
+      console.log("modal state", respServicio);
+      setShowToast(true);
+      if (respServicio.status === "success") {
+        onUserCreated();
+      }
     },
   });
 
@@ -106,42 +116,17 @@ export default function ModalNewUser() {
               )}
             />
 
-            <Label htmlFor="email" className="font-semibold">
-              Correo Electronico
-            </Label>
             <form.Field
               name="email"
               children={(field) => (
                 <>
+                  <Label htmlFor="email" className="font-semibold">
+                    Correo Electronico
+                  </Label>
                   <Input
                     id="email"
                     type="email"
                     placeholder="Correo Electronico"
-                    name={field.name}
-                    value={field.state.value}
-                    onChange={(e) => field.handleChange(e.target.value)}
-                  />
-                  {field.state.meta.errors.length > 0 &&
-                    field.state.meta.isTouched && (
-                      <span className="text-red-500 text-xs">
-                        *{field.state.meta.errors[0]?.message}
-                      </span>
-                    )}
-                </>
-              )}
-            />
-
-            <Label htmlFor="password" className="font-semibold">
-              Contraseña
-            </Label>
-            <form.Field
-              name="password"
-              children={(field) => (
-                <>
-                  <Input
-                    id="password"
-                    type="text"
-                    placeholder="Contraseña"
                     name={field.name}
                     value={field.state.value}
                     onChange={(e) => field.handleChange(e.target.value)}
@@ -211,11 +196,11 @@ export default function ModalNewUser() {
         {showToast && responseApi && (
           <Toast
             message={responseApi.message}
-            variant={responseApi.success ? "success" : "error"}
+            variant={responseApi.status === "success" ? "success" : "error"}
             duration={3000}
             onClose={() => {
               setShowToast(false);
-              setOpen(responseApi.success ? false : true);
+              setOpen(responseApi.status === "success" ? false : true);
             }}
           />
         )}

@@ -1,5 +1,5 @@
-export interface ApiResponseDto<T> {
-  status?: string;
-  message?: string;
-  data: T;
+export interface ApiResponseDto<T = void> {
+  status: string;
+  message: string;
+  data?: T;
 }
