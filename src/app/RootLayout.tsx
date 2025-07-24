@@ -44,9 +44,9 @@ const menuContent = [
     link: "/",
   },
   {
-    name: "menuButton 2",
+    name: "Usuarios y Accesos",
     icon: User,
-    link: "/routeFive",
+    link: "/user",
   },
   {
     name: "Usuarios",
@@ -55,7 +55,7 @@ const menuContent = [
       {
         name: "Crear Usuario",
         icon: Plus,
-        link: "/user",
+        link: "/routeFive",
       },
       {
         name: "Crear Rol",
@@ -99,14 +99,27 @@ export default function RootLayout() {
       const tokenStorageRepo = new TokenStorageRepositoryImp();
 
       const servicio = new UserService(userRepo, tokenStorageRepo);
+
       const reqProfile = await servicio.obteinProfile();
       const reqRoles = await servicio.getRoles();
-      const reqPermissions = await servicio.getPermissions();
-
+      console.log("Roles obtenidos:", reqRoles);
       useRolesStore.getState().setRoles(reqRoles.data || []);
-      usePermissionsStore.getState().setPermissions(reqPermissions.data || []);
       return reqProfile;
     },
+  });
+
+  useQuery({
+    queryKey: ["obtainPermissions"],
+    queryFn: async () => {
+      const userRepo = new UserRepositoryImp();
+      const tokenStorageRepo = new TokenStorageRepositoryImp();
+
+      const servicio = new UserService(userRepo, tokenStorageRepo);
+      const reqPermissions = await servicio.getPermissions();
+      usePermissionsStore.getState().setPermissions(reqPermissions.data || []);
+      return reqPermissions;
+    },
+    refetchOnWindowFocus: false,
   });
 
   useEffect(() => {

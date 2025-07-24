@@ -9,5 +9,5 @@ interface Permissions {
 export const usePermissionsStore = create<Permissions>()((set) => ({
   permissions: [],
   setPermissions: (permissions: PermissionEntity[]) =>
-    set((state) => ({ permissions: [...state.permissions, ...permissions] })),
+    set(() => ({ permissions })),
 }));

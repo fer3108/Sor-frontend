@@ -1,6 +1,7 @@
 import type { TokenStorageRepository } from "@/features/core/domain/repositories/TokenStorageRepository";
 import type { UserRepository } from "../domain/repositories/UserRepository";
 import type { newUserEntity } from "../domain/entities/newUserEntity";
+import type { PermissionEntity } from "../domain/entities/PermissionEntity";
 
 export class UserService {
   constructor(
@@ -36,5 +37,23 @@ export class UserService {
     const token = this.tokenStorageRepo.getToken("token");
     if (!token) throw new Error("Token inexistente");
     return this.userRepo.getPermissions(token);
+  }
+
+  async createPermission(permission: PermissionEntity) {
+    const token = this.tokenStorageRepo.getToken("token");
+    if (!token) throw new Error("Token inexistente");
+    return this.userRepo.createPermission(token, permission);
+  }
+
+  async updatePermission(permission: PermissionEntity) {
+    const token = this.tokenStorageRepo.getToken("token");
+    if (!token) throw new Error("Token inexistente");
+    return this.userRepo.updatePermission(token, permission);
+  }
+
+  async deletePermission(permission: PermissionEntity) {
+    const token = this.tokenStorageRepo.getToken("token");
+    if (!token) throw new Error("Token inexistente");
+    return this.userRepo.deletePermission(token, permission);
   }
 }

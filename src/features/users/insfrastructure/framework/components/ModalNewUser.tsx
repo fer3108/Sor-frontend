@@ -20,7 +20,7 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { useForm } from "@tanstack/react-form";
 import { useState } from "react";
-import { newUserSchema } from "../../user.controller";
+import { newUserSchema } from "../../schemas/user.controller";
 import { Toast } from "@/components/ui/toast";
 import { UserRepositoryImp } from "../../repositories/UserRepositoryImp";
 
@@ -127,6 +127,31 @@ export default function ModalNewUser({
                     id="email"
                     type="email"
                     placeholder="Correo Electronico"
+                    name={field.name}
+                    value={field.state.value}
+                    onChange={(e) => field.handleChange(e.target.value)}
+                  />
+                  {field.state.meta.errors.length > 0 &&
+                    field.state.meta.isTouched && (
+                      <span className="text-red-500 text-xs">
+                        *{field.state.meta.errors[0]?.message}
+                      </span>
+                    )}
+                </>
+              )}
+            />
+
+            <form.Field
+              name="password"
+              children={(field) => (
+                <>
+                  <Label htmlFor="password" className="font-semibold">
+                    Contraseña
+                  </Label>
+                  <Input
+                    id="password"
+                    type="password"
+                    placeholder="Contraseña"
                     name={field.name}
                     value={field.state.value}
                     onChange={(e) => field.handleChange(e.target.value)}

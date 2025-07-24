@@ -8,6 +8,5 @@ interface Roles {
 
 export const useRolesStore = create<Roles>()((set) => ({
   roles: [],
-  setRoles: (roles: RoleEntity[]) =>
-    set((state) => ({ roles: [...state.roles, ...roles] })),
+  setRoles: (roles: RoleEntity[]) => set(() => ({ roles })),
 }));

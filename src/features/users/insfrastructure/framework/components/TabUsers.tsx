@@ -12,11 +12,11 @@ export default function TabUsers({
   dataTable: any;
   refreshTable: () => void;
 }) {
-  const [editUser, SetEditUSer] = useState<UserEntity | null>(null);
+  const [editUser, setEditUser] = useState<UserEntity | null>(null);
   const [openEdit, setOpenEdit] = useState(false);
 
   const columns = columnsUsers((user: UserEntity) => {
-    SetEditUSer(user);
+    setEditUser(user);
     setOpenEdit(true);
   });
 

@@ -4,8 +4,8 @@ import { UserService } from "@/features/users/application/UserService";
 import { TokenStorageRepositoryImp } from "@/features/core/infrastructure/TokenStorageRepositoryImp";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import TabUsers from "../components/TabUsers";
-import TabPermissions from "../components/TabPermissions";
-import TabRoles from "../components/TabRoles";
+import TabPermissions from "../components/TabPermissions/TabPermissions";
+import TabRoles from "../components/TabRoles/TabRoles";
 import { LockIcon, ShieldIcon, UserCog2Icon } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 

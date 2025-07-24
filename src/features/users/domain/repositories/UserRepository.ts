@@ -12,5 +12,18 @@ export interface UserRepository {
   getProfile(token: String): Promise<ApiResponseEntity<UserEntity>>;
 
   getRoles(token: string): Promise<ApiResponseEntity<RoleEntity[]>>;
+
   getPermissions(token: string): Promise<ApiResponseEntity<PermissionEntity[]>>;
+  createPermission(
+    token: string,
+    permission: PermissionEntity
+  ): Promise<ApiResponseEntity<PermissionEntity>>;
+  updatePermission(
+    token: string,
+    permission: PermissionEntity
+  ): Promise<ApiResponseEntity<PermissionEntity>>;
+  deletePermission(
+    token: string,
+    permission: PermissionEntity
+  ): Promise<ApiResponseEntity>;
 }

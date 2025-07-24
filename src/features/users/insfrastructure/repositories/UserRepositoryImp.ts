@@ -102,12 +102,7 @@ export class UserRepositoryImp implements UserRepository {
       return {
         status: "success",
         message: "perfil obtenido",
-        data: {
-          email: data.email,
-          active: data.active,
-          username: data.username,
-          roles: data.roles,
-        },
+        data,
       };
     } catch (error) {
       console.log(error);
@@ -130,9 +125,9 @@ export class UserRepositoryImp implements UserRepository {
 
       if (!req.ok && req.status === 401)
         return { status: "fail", message: "No autorizado" };
-      const reqJson = await req.json();
+      const { data } = await req.json();
 
-      return { status: "success", message: "Roles obtenidos", data: reqJson };
+      return { status: "success", message: "Roles obtenidos", data };
     } catch (error) {
       console.log(error);
       return { status: "error", message: "Ocurrio un Error" };
@@ -154,15 +149,109 @@ export class UserRepositoryImp implements UserRepository {
 
       if (!req.ok && req.status === 401)
         return { status: "fail", message: "No autorizado" };
-      const reqJson = await req.json();
+      const { data } = await req.json();
 
       return {
         status: "success",
         message: "Permisos obtenidos",
-        data: reqJson,
+        data,
       };
     } catch (error) {
       console.log(error);
+      return { status: "error", message: "Ocurrio un Error" };
+    }
+  }
+
+  public async createPermission(
+    token: string,
+    permission: PermissionEntity
+  ): Promise<ApiResponseEntity<PermissionEntity>> {
+    try {
+      const response = await fetch(`${this.baseUrl}permissions`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(permission),
+      });
+
+      if (!response.ok && response.status === 409) {
+        return { status: "fail", message: "Nombre de permiso ya existe" };
+      }
+
+      if (!response.ok && response.status !== 401) {
+        return { status: "error", message: "Error Inesperado" };
+      }
+
+      if (!response.ok && response.status === 401)
+        return { status: "fail", message: "No autorizado" };
+
+      /* const { data } = await response.json(); */
+
+      return { status: "success", message: "Permiso creado" };
+    } catch (error) {
+      console.log("createPermission", error);
+      return { status: "error", message: "Ocurrio un Error" };
+    }
+  }
+  public async updatePermission(
+    token: string,
+    permission: PermissionEntity
+  ): Promise<ApiResponseEntity<PermissionEntity>> {
+    try {
+      const response = await fetch(
+        `${this.baseUrl}permissions/${permission.id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(permission),
+        }
+      );
+
+      if (!response.ok && response.status !== 401)
+        return { status: "error", message: "Error Inesperado" };
+
+      if (!response.ok && response.status === 401)
+        return { status: "fail", message: "No autorizado" };
+
+      const { data } = await response.json();
+
+      return { status: "success", message: "Permiso actualizado", data };
+    } catch (error) {
+      console.log("updatePermission", error);
+      return { status: "error", message: "Ocurrio un Error" };
+    }
+  }
+
+  public async deletePermission(
+    token: string,
+    permission: PermissionEntity
+  ): Promise<ApiResponseEntity> {
+    try {
+      console.log("deletePermissionImp", permission.id);
+      const response = await fetch(
+        `${this.baseUrl}permissions/${permission.id}`,
+        {
+          method: "PATCH",
+          headers: {
+            authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      console.log("deletePermissionImp", await response.json());
+      if (!response.ok && response.status !== 401)
+        return { status: "error", message: "Error Inesperado" };
+
+      if (!response.ok && response.status === 401)
+        return { status: "fail", message: "No autorizado" };
+
+      return { status: "success", message: "Permiso eliminado" };
+    } catch (error) {
+      console.log("deletePermission", error);
       return { status: "error", message: "Ocurrio un Error" };
     }
   }
