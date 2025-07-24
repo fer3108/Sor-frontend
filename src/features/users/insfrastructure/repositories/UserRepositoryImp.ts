@@ -7,6 +7,9 @@ import type { UserEntity } from "../../domain/entities/UserEntity";
 import type { newUserEntity } from "../../domain/entities/newUserEntity";
 import type { RoleEntity } from "../../domain/entities/RoleEntity";
 import type { PermissionEntity } from "../../domain/entities/PermissionEntity";
+import adapterRoleDtoToApi from "../adapters/adapterRoleDtoToApi";
+import type { EditRoleEntity } from "../../domain/entities/EditRoleEntity";
+import type { NewRoleEntity } from "../../domain/entities/NewRoleEntity";
 
 export class UserRepositoryImp implements UserRepository {
   private readonly baseUrl: string;
@@ -104,30 +107,6 @@ export class UserRepositoryImp implements UserRepository {
         message: "perfil obtenido",
         data,
       };
-    } catch (error) {
-      console.log(error);
-      return { status: "error", message: "Ocurrio un Error" };
-    }
-  }
-
-  public async getRoles(
-    token: string
-  ): Promise<ApiResponseEntity<RoleEntity[]>> {
-    try {
-      const req = await fetch(`${this.baseUrl}roles/active`, {
-        headers: {
-          authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (!req.ok && req.status !== 401)
-        return { status: "error", message: "Error Inesperado" };
-
-      if (!req.ok && req.status === 401)
-        return { status: "fail", message: "No autorizado" };
-      const { data } = await req.json();
-
-      return { status: "success", message: "Roles obtenidos", data };
     } catch (error) {
       console.log(error);
       return { status: "error", message: "Ocurrio un Error" };
@@ -252,6 +231,129 @@ export class UserRepositoryImp implements UserRepository {
       return { status: "success", message: "Permiso eliminado" };
     } catch (error) {
       console.log("deletePermission", error);
+      return { status: "error", message: "Ocurrio un Error" };
+    }
+  }
+
+  public async getRoles(
+    token: string
+  ): Promise<ApiResponseEntity<RoleEntity[]>> {
+    try {
+      const req = await fetch(`${this.baseUrl}roles/active`, {
+        headers: {
+          authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!req.ok && req.status !== 401)
+        return { status: "error", message: "Error Inesperado" };
+
+      if (!req.ok && req.status === 401)
+        return { status: "fail", message: "No autorizado" };
+      const { data } = await req.json();
+
+      return { status: "success", message: "Roles obtenidos", data };
+    } catch (error) {
+      console.log(error);
+      return { status: "error", message: "Ocurrio un Error" };
+    }
+  }
+
+  public async createRole(
+    token: string,
+    role: NewRoleEntity
+  ): Promise<ApiResponseEntity<NewRoleEntity>> {
+    const roleAdapter = adapterRoleDtoToApi(role);
+
+    try {
+      const response = await fetch(`${this.baseUrl}roles`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(roleAdapter),
+      });
+
+      if (!response.ok && response.status === 409) {
+        return { status: "fail", message: "Nombre de rol ya existe" };
+      }
+
+      if (!response.ok && response.status !== 401) {
+        return { status: "error", message: "Error Inesperado" };
+      }
+
+      if (!response.ok && response.status === 401) {
+        return { status: "fail", message: "No autorizado" };
+      }
+
+      /* const { data } = await response.json(); */
+
+      return { status: "success", message: "Rol creado" };
+    } catch (error) {
+      console.log("createRole", error);
+      return { status: "error", message: "Ocurrio un Error" };
+    }
+  }
+
+  public async updateRole(
+    token: string,
+    role: EditRoleEntity
+  ): Promise<ApiResponseEntity<EditRoleEntity>> {
+    const roleAdapter = adapterRoleDtoToApi(role);
+
+    try {
+      const response = await fetch(`${this.baseUrl}roles/${role.id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(roleAdapter),
+      });
+      console.log("updateRole1", response);
+      if (!response.ok && response.status !== 401) {
+        return { status: "error", message: "Error Inesperado" };
+      }
+
+      if (!response.ok && response.status === 401) {
+        console.log("updateRole2", response);
+        console.log("updateRole3", await response.json());
+        return { status: "fail", message: "No autorizado" };
+      }
+
+      /* const responseJson = await response.json(); */
+
+      /* const { data } = responseJson; */
+
+      return { status: "success", message: "Rol actualizado" /* data */ };
+    } catch (error) {
+      console.log("updateRole", error);
+      return { status: "error", message: "Ocurrio un Error" };
+    }
+  }
+
+  public async deleteRole(
+    token: string,
+    role: RoleEntity
+  ): Promise<ApiResponseEntity<RoleEntity>> {
+    try {
+      const response = await fetch(`${this.baseUrl}roles/${role.id}`, {
+        method: "PATCH",
+        headers: {
+          authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok && response.status !== 401)
+        return { status: "error", message: "Error Inesperado" };
+
+      if (!response.ok && response.status === 401)
+        return { status: "fail", message: "No autorizado" };
+
+      return { status: "success", message: "Rol eliminado" };
+    } catch (error) {
+      console.log("deleteRole", error);
       return { status: "error", message: "Ocurrio un Error" };
     }
   }

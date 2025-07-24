@@ -4,6 +4,6 @@ export interface RoleEntity {
   id?: string;
   name: string;
   description: string;
-  isActive: boolean;
+  enabled: boolean;
   permissionList: PermissionEntity[];
 }

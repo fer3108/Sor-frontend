@@ -1,6 +1,6 @@
 export interface PermissionDto {
-  idPermission: string;
+  id?: string;
   name: string;
   description: string;
-  isActive: boolean;
+  enabled?: boolean;
 }

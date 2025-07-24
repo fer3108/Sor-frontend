@@ -1,5 +1,10 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import type { RoleEntity } from "@/features/users/domain/entities/RoleEntity";
 
 import type { ColumnDef } from "@tanstack/react-table";
@@ -15,8 +20,46 @@ export const columnsRoles = (
       return row.index + 1;
     },
   },
-  { accessorKey: "name", header: "Nombre Permiso" },
+  { accessorKey: "name", header: "Nombre Rol" },
   { accessorKey: "description", header: "Descripción" },
+  {
+    header: "Permisos Asignados",
+    accessorKey: "permissionList",
+    cell: ({ getValue }) => {
+      const permissions = getValue() as { id: string | number; name: string }[];
+      const maxToShow = 1;
+      return (
+        <div className="flex flex-wrap gap-1 items-center">
+          {permissions.slice(0, maxToShow).map((permission) => (
+            <Badge key={permission.id} variant="secondary">
+              {permission.name}
+            </Badge>
+          ))}
+          {permissions.length > maxToShow && (
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="link" className="p-0 text-xs">
+                  +{permissions.length - maxToShow} más
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="max-w-xs">
+                <div className="flex flex-wrap gap-1">
+                  {permissions.map((permission) => (
+                    <Badge key={permission.id} variant="outline">
+                      {permission.name}
+                    </Badge>
+                  ))}
+                </div>
+              </PopoverContent>
+            </Popover>
+          )}
+          {permissions.length === 0 && (
+            <span className="text-gray-400 text-xs">Sin permisos</span>
+          )}
+        </div>
+      );
+    },
+  },
   {
     header: "Estado",
     accessorKey: "enabled",

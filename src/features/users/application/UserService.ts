@@ -2,6 +2,9 @@ import type { TokenStorageRepository } from "@/features/core/domain/repositories
 import type { UserRepository } from "../domain/repositories/UserRepository";
 import type { newUserEntity } from "../domain/entities/newUserEntity";
 import type { PermissionEntity } from "../domain/entities/PermissionEntity";
+import type { EditRoleEntity } from "../domain/entities/EditRoleEntity";
+import type { NewRoleEntity } from "../domain/entities/NewRoleEntity";
+import type { RoleEntity } from "../domain/entities/RoleEntity";
 
 export class UserService {
   constructor(
@@ -27,12 +30,6 @@ export class UserService {
     return this.userRepo.getProfile(token);
   }
 
-  async getRoles() {
-    const token = this.tokenStorageRepo.getToken("token");
-    if (!token) throw new Error("Token inexistente");
-    return this.userRepo.getRoles(token);
-  }
-
   async getPermissions() {
     const token = this.tokenStorageRepo.getToken("token");
     if (!token) throw new Error("Token inexistente");
@@ -55,5 +52,29 @@ export class UserService {
     const token = this.tokenStorageRepo.getToken("token");
     if (!token) throw new Error("Token inexistente");
     return this.userRepo.deletePermission(token, permission);
+  }
+
+  async getRoles() {
+    const token = this.tokenStorageRepo.getToken("token");
+    if (!token) throw new Error("Token inexistente");
+    return this.userRepo.getRoles(token);
+  }
+
+  async createRole(role: NewRoleEntity) {
+    const token = this.tokenStorageRepo.getToken("token");
+    if (!token) throw new Error("Token inexistente");
+    return this.userRepo.createRole(token, role);
+  }
+
+  async updateRole(role: EditRoleEntity) {
+    const token = this.tokenStorageRepo.getToken("token");
+    if (!token) throw new Error("Token inexistente");
+    return this.userRepo.updateRole(token, role);
+  }
+
+  async deleteRole(role: RoleEntity) {
+    const token = this.tokenStorageRepo.getToken("token");
+    if (!token) throw new Error("Token inexistente");
+    return this.userRepo.deleteRole(token, role);
   }
 }

@@ -1,4 +1,4 @@
-import type { RoleDTO } from "./RoleDto";
+import type { RoleDTO } from "./EditRoleDto";
 
 export interface UserDto {
   id: string;

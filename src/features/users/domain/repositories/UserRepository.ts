@@ -3,6 +3,8 @@ import type { UserEntity } from "../entities/UserEntity";
 import type { newUserEntity } from "../entities/newUserEntity";
 import type { RoleEntity } from "../entities/RoleEntity";
 import type { PermissionEntity } from "../entities/PermissionEntity";
+import type { EditRoleEntity } from "../entities/EditRoleEntity";
+import type { NewRoleEntity } from "../entities/NewRoleEntity";
 
 export interface UserRepository {
   // getUserById(id: string): Promise<User>;
@@ -10,8 +12,6 @@ export interface UserRepository {
   createUser(user: newUserEntity, token: string): Promise<ApiResponseEntity>;
   getUsers(token: string): Promise<ApiResponseEntity<UserEntity[]>>;
   getProfile(token: String): Promise<ApiResponseEntity<UserEntity>>;
-
-  getRoles(token: string): Promise<ApiResponseEntity<RoleEntity[]>>;
 
   getPermissions(token: string): Promise<ApiResponseEntity<PermissionEntity[]>>;
   createPermission(
@@ -26,4 +26,18 @@ export interface UserRepository {
     token: string,
     permission: PermissionEntity
   ): Promise<ApiResponseEntity>;
+
+  getRoles(token: string): Promise<ApiResponseEntity<RoleEntity[]>>;
+  createRole(
+    token: string,
+    role: NewRoleEntity
+  ): Promise<ApiResponseEntity<NewRoleEntity>>;
+  updateRole(
+    token: string,
+    role: EditRoleEntity
+  ): Promise<ApiResponseEntity<EditRoleEntity>>;
+  deleteRole(
+    token: string,
+    role: RoleEntity
+  ): Promise<ApiResponseEntity<RoleEntity>>;
 }

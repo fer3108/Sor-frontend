@@ -101,9 +101,6 @@ export default function RootLayout() {
       const servicio = new UserService(userRepo, tokenStorageRepo);
 
       const reqProfile = await servicio.obteinProfile();
-      const reqRoles = await servicio.getRoles();
-      console.log("Roles obtenidos:", reqRoles);
-      useRolesStore.getState().setRoles(reqRoles.data || []);
       return reqProfile;
     },
   });
@@ -118,6 +115,20 @@ export default function RootLayout() {
       const reqPermissions = await servicio.getPermissions();
       usePermissionsStore.getState().setPermissions(reqPermissions.data || []);
       return reqPermissions;
+    },
+    refetchOnWindowFocus: false,
+  });
+
+  useQuery({
+    queryKey: ["obtainRoles"],
+    queryFn: async () => {
+      const userRepo = new UserRepositoryImp();
+      const tokenStorageRepo = new TokenStorageRepositoryImp();
+
+      const servicio = new UserService(userRepo, tokenStorageRepo);
+      const reqRoles = await servicio.getRoles();
+      useRolesStore.getState().setRoles(reqRoles.data || []);
+      return reqRoles;
     },
     refetchOnWindowFocus: false,
   });
