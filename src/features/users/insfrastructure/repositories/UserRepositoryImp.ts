@@ -1,15 +1,13 @@
 import type { ApiResponseEntity } from "@/features/core/domain/entities/ApiResponse.entity";
 
-import type { ApiResponseDto } from "../dtos/ApiResponseDto";
-import type { UserDto } from "../dtos/UserDto";
 import type { UserRepository } from "../../domain/repositories/UserRepository";
 import type { UserEntity } from "../../domain/entities/UserEntity";
-import type { newUserEntity } from "../../domain/entities/newUserEntity";
 import type { RoleEntity } from "../../domain/entities/RoleEntity";
 import type { PermissionEntity } from "../../domain/entities/PermissionEntity";
 import adapterRoleDtoToApi from "../adapters/adapterRoleDtoToApi";
 import type { EditRoleEntity } from "../../domain/entities/EditRoleEntity";
 import type { NewRoleEntity } from "../../domain/entities/NewRoleEntity";
+import type { NewUserEntity } from "../../domain/entities/NewUserEntity";
 
 export class UserRepositoryImp implements UserRepository {
   private readonly baseUrl: string;
@@ -18,8 +16,61 @@ export class UserRepositoryImp implements UserRepository {
     this.baseUrl = import.meta.env.VITE_API_URL_V1;
   }
 
+  public async getProfile(
+    token: string
+  ): Promise<ApiResponseEntity<UserEntity>> {
+    try {
+      const url = import.meta.env.VITE_API_URL_V1;
+      const response = await fetch(`${url}auth/me`, {
+        headers: {
+          authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok && response.status !== 401)
+        return { status: "error", message: "Error Inesperado" };
+
+      if (!response.ok && response.status === 401)
+        return { status: "fail", message: "No autorizado" };
+
+      const { data } = await response.json();
+
+      return {
+        status: "success",
+        message: "perfil obtenido",
+        data,
+      };
+    } catch (error) {
+      console.log(error);
+      return { status: "error", message: "Ocurrio un Error" };
+    }
+  }
+
+  public async getUsers(
+    token: string
+  ): Promise<ApiResponseEntity<UserEntity[]>> {
+    try {
+      const url = import.meta.env.VITE_API_URL_V1;
+      const response = await fetch(`${url}users/active`, {
+        headers: { authorization: `Bearer ${token}` },
+      });
+      if (!response.ok && response.status !== 401)
+        return { status: "error", message: "Error Inesperado" };
+
+      if (!response.ok && response.status === 401)
+        return { status: "fail", message: "No autorizado" };
+
+      const { data } = await response.json();
+
+      return { status: "success", message: "Usuarios Obtenidos", data };
+    } catch (error) {
+      console.log("getUsersImp", error);
+      return { status: "error", message: "Ocurrio un Error" };
+    }
+  }
+
   public async createUser(
-    user: newUserEntity,
+    user: NewUserEntity,
     token: string
   ): Promise<ApiResponseEntity> {
     try {
@@ -60,14 +111,20 @@ export class UserRepositoryImp implements UserRepository {
     }
   }
 
-  public async getUsers(
+  public async updateUser(
+    user: NewUserEntity,
     token: string
-  ): Promise<ApiResponseEntity<UserEntity[]>> {
+  ): Promise<ApiResponseEntity<NewUserEntity>> {
     try {
-      const url = import.meta.env.VITE_API_URL_V1;
-      const response = await fetch(`${url}users/active`, {
-        headers: { authorization: `Bearer ${token}` },
+      const response = await fetch(`${this.baseUrl}users/${user.id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(user),
       });
+
       if (!response.ok && response.status !== 401)
         return { status: "error", message: "Error Inesperado" };
 
@@ -76,19 +133,20 @@ export class UserRepositoryImp implements UserRepository {
 
       const { data } = await response.json();
 
-      return { status: "success", message: "Usuarios Obtenidos", data };
+      return { status: "success", message: "Usuario actualizado", data };
     } catch (error) {
-      console.log("getUsersImp", error);
+      console.log("updateUser", error);
       return { status: "error", message: "Ocurrio un Error" };
     }
   }
 
-  public async getProfile(
+  public async deleteUser(
+    user: UserEntity,
     token: string
-  ): Promise<ApiResponseEntity<UserEntity>> {
+  ): Promise<ApiResponseEntity> {
     try {
-      const url = import.meta.env.VITE_API_URL_V1;
-      const response = await fetch(`${url}auth/me`, {
+      const response = await fetch(`${this.baseUrl}users/${user.id}`, {
+        method: "PATCH",
         headers: {
           authorization: `Bearer ${token}`,
         },
@@ -100,15 +158,9 @@ export class UserRepositoryImp implements UserRepository {
       if (!response.ok && response.status === 401)
         return { status: "fail", message: "No autorizado" };
 
-      const { data }: ApiResponseDto<UserDto> = await response.json();
-
-      return {
-        status: "success",
-        message: "perfil obtenido",
-        data,
-      };
+      return { status: "success", message: "Usuario eliminado" };
     } catch (error) {
-      console.log(error);
+      console.log("deleteUser", error);
       return { status: "error", message: "Ocurrio un Error" };
     }
   }

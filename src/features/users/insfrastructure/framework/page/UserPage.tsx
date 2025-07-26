@@ -8,11 +8,13 @@ import TabPermissions from "../components/TabPermissions/TabPermissions";
 import TabRoles from "../components/TabRoles/TabRoles";
 import { LockIcon, ShieldIcon, UserCog2Icon } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
+import { usePermissionsStore } from "@/features/core/infrastructure/stores/usePersmissionsStore";
+import { useRolesStore } from "@/features/core/infrastructure/stores/useRolesStore";
 
 export default function UserPage() {
-  const { data, isPending, refetch } = useQuery({
+  const { data, isPending } = useQuery({
     refetchOnWindowFocus: false,
-    queryKey: ["getUsers"],
+    queryKey: ["obtainUsers"],
     queryFn: async () => {
       const userRepo = new UserRepositoryImp();
       const tokenStorageRepo = new TokenStorageRepositoryImp();
@@ -21,6 +23,34 @@ export default function UserPage() {
       const respUsers = await userService.getUsers();
       return respUsers;
     },
+  });
+
+  useQuery({
+    queryKey: ["obtainPermissions"],
+    queryFn: async () => {
+      const userRepo = new UserRepositoryImp();
+      const tokenStorageRepo = new TokenStorageRepositoryImp();
+
+      const servicio = new UserService(userRepo, tokenStorageRepo);
+      const reqPermissions = await servicio.getPermissions();
+      usePermissionsStore.getState().setPermissions(reqPermissions.data || []);
+      return reqPermissions;
+    },
+    refetchOnWindowFocus: false,
+  });
+
+  useQuery({
+    queryKey: ["obtainRoles"],
+    queryFn: async () => {
+      const userRepo = new UserRepositoryImp();
+      const tokenStorageRepo = new TokenStorageRepositoryImp();
+
+      const servicio = new UserService(userRepo, tokenStorageRepo);
+      const reqRoles = await servicio.getRoles();
+      useRolesStore.getState().setRoles(reqRoles.data || []);
+      return reqRoles;
+    },
+    refetchOnWindowFocus: false,
   });
 
   if (isPending) {
@@ -60,7 +90,7 @@ export default function UserPage() {
         </TabsList>
         <Separator className="my-2" />
         <TabsContent value="users">
-          <TabUsers dataTable={data?.data ?? []} refreshTable={refetch} />
+          <TabUsers dataTable={data?.data ?? []} />
         </TabsContent>
         <TabsContent value="roles">
           <TabRoles />

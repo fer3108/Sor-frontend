@@ -27,6 +27,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 
 export default function ModalNewRol() {
   const permissionsStore = usePermissionsStore((state) => state.permissions);
+
   const [openModal, setOpenModal] = useState(false);
   const [resApi, setResApi] = useState<ApiResponseEntity<NewRoleEntity>>();
   const [showToast, setShowToast] = useState(false);
@@ -38,7 +39,6 @@ export default function ModalNewRol() {
       onChange: newRoleSchema,
     },
     onSubmit: async ({ value }) => {
-      console.log("Submitting new role:", value);
       const userRepo = new UserRepositoryImp();
       const tokenStorageRepo = new TokenStorageRepositoryImp();
       const servicio = new UserService(userRepo, tokenStorageRepo);

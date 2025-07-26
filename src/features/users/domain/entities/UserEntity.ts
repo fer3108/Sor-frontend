@@ -4,6 +4,7 @@ export interface UserEntity {
   id?: string;
   username: string;
   email: string;
-  active?: boolean;
+  password: string;
+  enabled?: boolean;
   roles: RoleEntity[];
 }

@@ -10,42 +10,45 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { useForm } from "@tanstack/react-form";
 import { useState } from "react";
-import { newUserSchema } from "../../schemas/user.controller";
 import { Toast } from "@/components/ui/toast";
-import { UserRepositoryImp } from "../../repositories/UserRepositoryImp";
-
 import { TokenStorageRepositoryImp } from "@/features/core/infrastructure/TokenStorageRepositoryImp";
 import { UserService } from "@/features/users/application/UserService";
-import type { ApiResponseDto } from "../../dtos/ApiResponseDto";
+import { newUserSchema } from "../../../schemas/newUserSchema";
+import { UserRepositoryImp } from "../../../repositories/UserRepositoryImp";
+import type { ApiResponseDto } from "../../../dtos/ApiResponseDto";
+import { useRolesStore } from "@/features/core/infrastructure/stores/useRolesStore";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Checkbox } from "@/components/ui/checkbox";
+import { useQueryClient } from "@tanstack/react-query";
+import type { RoleEntity } from "@/features/users/domain/entities/RoleEntity";
+import { Badge } from "@/components/ui/badge";
 
-export default function ModalNewUser({
-  onUserCreated,
-}: {
-  onUserCreated: () => void;
-}) {
-  const [open, setOpen] = useState(false);
-  const [showToast, setShowToast] = useState(false);
+export default function ModalNewUser() {
+  const rolesStore = useRolesStore((state) => state.roles);
+
+  const [openModal, setOpenModal] = useState(false);
   const [responseApi, setResponseApi] = useState<ApiResponseDto>();
+  const [showToast, setShowToast] = useState(false);
+  const queryClient = useQueryClient();
 
-  const handleDialogChange = (isOpen: boolean) => {
-    setOpen(isOpen);
-    if (!isOpen) {
-      setShowToast(false);
-    }
-  };
+  const [selectedRole, setSelectedRole] = useState<{
+    role: string;
+    permissions: string[];
+  }>({
+    role: "",
+    permissions: [],
+  });
 
   const form = useForm({
-    defaultValues: { username: "", email: "", password: "", roles: [""] },
+    defaultValues: {
+      username: "",
+      email: "",
+      password: "13245678",
+      roles: [""],
+    },
     validators: {
       onChange: newUserSchema,
     },
@@ -54,23 +57,35 @@ export default function ModalNewUser({
       const tokenStorageRepo = new TokenStorageRepositoryImp();
       const servicio = new UserService(userRepo, tokenStorageRepo);
       const respServicio = await servicio.createUser(value);
-      console.log("modal ", respServicio);
+
       setResponseApi(respServicio);
-      console.log("modal state", respServicio);
       setShowToast(true);
+
       if (respServicio.status === "success") {
-        onUserCreated();
+        queryClient.invalidateQueries({ queryKey: ["obtainUsers"] });
       }
     },
   });
 
+  const handleSelectedRoleChange = (role: RoleEntity) => {
+    const permissionsName = role.permissionList.map((p) => p.name);
+    setSelectedRole({ role: role.name, permissions: permissionsName });
+  };
+
   return (
-    <Dialog open={open} onOpenChange={handleDialogChange}>
+    <Dialog
+      open={openModal}
+      onOpenChange={(isOpen) => {
+        setOpenModal(isOpen);
+        if (!isOpen) {
+          setSelectedRole({ role: "", permissions: [] });
+        }
+      }}
+    >
       <DialogTrigger asChild>
         <Button
           onClick={() => {
             form.reset();
-            setOpen(true);
           }}
         >
           Crear Usuario
@@ -88,7 +103,6 @@ export default function ModalNewUser({
             e.stopPropagation();
             form.handleSubmit();
           }}
-          noValidate
         >
           <div className="grid gap-4">
             <form.Field
@@ -166,47 +180,85 @@ export default function ModalNewUser({
               )}
             />
           </div>
-          <div className="grid gap-3">
-            <Label htmlFor="roles" className="font-semibold">
-              Rol del Usuario
-            </Label>
-            <form.Field
-              name="roles"
-              children={(field) => (
-                <>
-                  <Select
-                    onValueChange={(value) =>
-                      field.setValue([value.toUpperCase()])
-                    }
-                  >
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Seleccione un Rol" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="ADMIN">Administrador</SelectItem>
-                      <SelectItem value="USER">Usuario</SelectItem>
-                    </SelectContent>
-                  </Select>
+
+          <form.Field
+            name="roles"
+            children={(field) => (
+              <div className="flex gap-2">
+                <div className="w-1/2 border border-gray-300 rounded p-2">
+                  <Label>Asignar Roles</Label>
+                  <Separator className="my-1" />
+                  <ScrollArea className="h-48" type="always">
+                    {rolesStore.map(
+                      (role) =>
+                        role.enabled && (
+                          <div
+                            key={role.id}
+                            className={`flex gap-2 p-2 cursor-pointer hover:bg-gray-100 ${
+                              selectedRole.role === role.name
+                                ? "bg-blue-200"
+                                : ""
+                            }`}
+                            onClick={() => {
+                              handleSelectedRoleChange(role);
+                            }}
+                          >
+                            <Checkbox
+                              onCheckedChange={(checked) => {
+                                if (checked) {
+                                  field.handleChange([
+                                    ...field.state.value.filter(
+                                      (p: string) => p !== ""
+                                    ),
+                                    role.name,
+                                  ]);
+                                } else {
+                                  field.handleChange(
+                                    field.state.value.filter(
+                                      (p: string) => p !== role.name
+                                    )
+                                  );
+                                }
+                              }}
+                            />
+                            <Label className="flex items-center">
+                              {role.name}
+                            </Label>
+                          </div>
+                        )
+                    )}
+                  </ScrollArea>
                   {field.state.meta.errors.length > 0 &&
-                    (field.state.meta.isTouched || form.state.isSubmitted) && (
+                    field.state.meta.isTouched && (
                       <span className="text-red-500 text-xs">
                         *{field.state.meta.errors[0]?.message}
                       </span>
                     )}
-                </>
-              )}
-            />
-          </div>
+                </div>
+
+                <div className="w-1/2 border border-gray-300 rounded p-2">
+                  <Label>Permisos del Rol Seleccionado</Label>
+                  <Separator className="my-1" />
+                  <ScrollArea className="h-48" type="always">
+                    <div className="flex flex-col gap-2">
+                      {selectedRole.permissions.map((permissionName, index) => {
+                        return (
+                          <Badge key={index} variant={"outline"}>
+                            {permissionName}
+                          </Badge>
+                        );
+                      })}
+                    </div>
+                  </ScrollArea>
+                </div>
+              </div>
+            )}
+          />
+
           <Separator className="my-2" />
           <DialogFooter>
             <DialogClose asChild>
-              <Button
-                variant="outline"
-                type="button"
-                onClick={() => setOpen(false)}
-              >
-                Cancel
-              </Button>
+              <Button variant="outline">Cancel</Button>
             </DialogClose>
             <form.Subscribe
               selector={(state) => [state.canSubmit, state.isSubmitting]}
@@ -225,7 +277,7 @@ export default function ModalNewUser({
             duration={3000}
             onClose={() => {
               setShowToast(false);
-              setOpen(responseApi.status === "success" ? false : true);
+              setOpenModal(responseApi.status === "success" ? false : true);
             }}
           />
         )}

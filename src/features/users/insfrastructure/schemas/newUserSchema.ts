@@ -6,12 +6,7 @@ export const newUserSchema = z.object({
   }),
   email: z.email({ error: "Email no valido" }),
   password: z
-    .string()
+    .string({ error: "Contraseña debe tener al menos 8 caracteres" })
     .min(8, { error: "Contraseña debe tener al menos 8 caracteres" }),
-  roles: z
-    .array(z.string().min(1, { error: "select rol" }))
-    .refine((arr) => arr.every((r) => r !== ""), {
-      message: "Selecciona un rol válido",
-    })
-    .min(1, { error: "Selecciona un Rol" }),
+  roles: z.array(z.string().min(1, { error: "select rol" })),
 });

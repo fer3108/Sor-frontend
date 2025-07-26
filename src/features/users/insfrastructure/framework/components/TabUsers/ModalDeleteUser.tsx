@@ -12,30 +12,30 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { UserRepositoryImp } from "../../../repositories/UserRepositoryImp";
 import { TokenStorageRepositoryImp } from "@/features/core/infrastructure/TokenStorageRepositoryImp";
 import { UserService } from "@/features/users/application/UserService";
-import type { RoleEntity } from "@/features/users/domain/entities/RoleEntity";
+import type { UserEntity } from "@/features/users/domain/entities/UserEntity";
 
-export default function ModalDeleteRole({
+export default function ModalDeleteUser({
   open,
   onOpenChange,
-  selectRole,
+  selectUser,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onDelete: (role: RoleEntity) => void;
-  selectRole: RoleEntity | null;
+  onDelete: (user: UserEntity) => void;
+  selectUser: UserEntity | null;
 }) {
   const queryClient = useQueryClient();
   const mutation = useMutation({
-    mutationFn: async (role: RoleEntity) => {
-      console.log("Deleting role:", role.id);
+    mutationFn: async (user: UserEntity) => {
+      console.log("Deleting user:", user.id);
       const userRepo = new UserRepositoryImp();
       const tokenStorageRepo = new TokenStorageRepositoryImp();
       const service = new UserService(userRepo, tokenStorageRepo);
 
-      return await service.deleteRole(role);
+      return await service.deleteUser(user);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["obtainRoles"] });
+      queryClient.invalidateQueries({ queryKey: ["obtainUsers"] });
       onOpenChange(false);
     },
   });
@@ -47,7 +47,7 @@ export default function ModalDeleteRole({
           <DialogTitle>Eliminar Permiso</DialogTitle>
         </DialogHeader>
         <Separator className="my-1" />
-        <div>¿Estás seguro de que deseas eliminar este Rol?</div>
+        <div>¿Estás seguro de que deseas eliminar este Usuario?</div>
         <Separator className="my-1" />
         <DialogFooter>
           <DialogClose asChild>
@@ -56,11 +56,11 @@ export default function ModalDeleteRole({
           <Button
             variant={"destructive"}
             onClick={() => {
-              if (selectRole) {
-                mutation.mutate(selectRole);
+              if (selectUser) {
+                mutation.mutate(selectUser);
               }
             }}
-            disabled={!selectRole || mutation.isPending}
+            disabled={!selectUser || mutation.isPending}
           >
             {mutation.isPending ? "Eliminando..." : "Eliminar"}
           </Button>

@@ -1,5 +1,7 @@
-import type { UserEntity } from "./UserEntity";
-
-export interface newUserEntity extends Omit<UserEntity, "roles"> {
+export type NewUserEntity = {
+  id?: string;
+  username: string;
+  email: string;
+  password: string;
   roles: string[];
-}
+};

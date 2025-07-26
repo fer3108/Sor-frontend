@@ -1,35 +1,45 @@
-import type { UserEntity } from "@/features/users/domain/entities/UserEntity";
-import ModalNewUser from "./ModalNewUser";
-import { columnsUsers } from "./Table/columns-users";
-import { DataTableUsers } from "./Table/data-table-users";
+import { columnsUsers } from "./TabUsers/Table/columns-users";
 import { useState } from "react";
-import ModalEditUser from "./ModalEditUser";
+import ModalEditUser from "./TabUsers/ModalEditUser";
+import ModalNewUser from "./TabUsers/ModalNewUser";
+import { TableUsers } from "./TabUsers/Table/TableUsers";
+import ModalDeleteUser from "./TabUsers/ModalDeleteUser";
+import type { UserEntity } from "@/features/users/domain/entities/UserEntity";
 
-export default function TabUsers({
-  dataTable,
-  refreshTable,
-}: {
-  dataTable: any;
-  refreshTable: () => void;
-}) {
-  const [editUser, setEditUser] = useState<UserEntity | null>(null);
-  const [openEdit, setOpenEdit] = useState(false);
+export default function TabUsers({ dataTable }: { dataTable: any }) {
+  const [selectedUser, setSelectedUser] = useState<UserEntity | null>(null);
+  const [editOpenModal, setEditOpenModal] = useState(false);
+  const [deleteOpenModal, setDeleteOpenModal] = useState(false);
 
-  const columns = columnsUsers((user: UserEntity) => {
-    setEditUser(user);
-    setOpenEdit(true);
-  });
+  const handleEditRole = (user: UserEntity) => {
+    setSelectedUser(user);
+    setEditOpenModal(true);
+  };
+
+  const handleDeleteUser = (user: UserEntity) => {
+    setSelectedUser(user);
+    setDeleteOpenModal(true);
+  };
 
   return (
     <div className="w-full p-2 flex flex-col gap-4">
-      <div>
-        <ModalNewUser onUserCreated={refreshTable} />
+      <div className="flex justify-end items-center mb-4">
+        <ModalNewUser />
       </div>
-      <DataTableUsers columns={columns} data={dataTable} />
+      <TableUsers
+        columns={columnsUsers(handleEditRole, handleDeleteUser)}
+        data={dataTable}
+      />
       <ModalEditUser
-        open={openEdit}
-        onOpenChange={setOpenEdit}
-        data={editUser}
+        open={editOpenModal}
+        onOpenChange={setEditOpenModal}
+        data={selectedUser}
+      />
+      <ModalDeleteUser
+        open={deleteOpenModal}
+        onOpenChange={setDeleteOpenModal}
+        onDelete={handleDeleteUser}
+        selectUser={selectedUser}
       />
     </div>
   );

@@ -18,7 +18,7 @@ interface DataTableProps<TData, TValue> {
   data: TData[];
 }
 
-export function DataTableUsers<TData, TValue>({
+export function TableUsers<TData, TValue>({
   columns,
   data,
 }: DataTableProps<TData, TValue>) {

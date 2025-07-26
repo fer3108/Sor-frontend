@@ -34,8 +34,6 @@ import { UserRepositoryImp } from "@/features/users/insfrastructure/repositories
 import { UserService } from "@/features/users/application/UserService";
 import { TokenStorageRepositoryImp } from "@/features/core/infrastructure/TokenStorageRepositoryImp";
 import { useEffect } from "react";
-import { useRolesStore } from "@/features/core/infrastructure/stores/useRolesStore";
-import { usePermissionsStore } from "@/features/core/infrastructure/stores/usePersmissionsStore";
 
 const menuContent = [
   {
@@ -92,8 +90,7 @@ export default function RootLayout() {
   const navigate = useNavigate();
 
   const { data, isPending, error } = useQuery({
-    refetchOnWindowFocus: false,
-    queryKey: ["obtener"],
+    queryKey: ["obtainProfile"],
     queryFn: async () => {
       const userRepo = new UserRepositoryImp();
       const tokenStorageRepo = new TokenStorageRepositoryImp();
@@ -102,33 +99,6 @@ export default function RootLayout() {
 
       const reqProfile = await servicio.obteinProfile();
       return reqProfile;
-    },
-  });
-
-  useQuery({
-    queryKey: ["obtainPermissions"],
-    queryFn: async () => {
-      const userRepo = new UserRepositoryImp();
-      const tokenStorageRepo = new TokenStorageRepositoryImp();
-
-      const servicio = new UserService(userRepo, tokenStorageRepo);
-      const reqPermissions = await servicio.getPermissions();
-      usePermissionsStore.getState().setPermissions(reqPermissions.data || []);
-      return reqPermissions;
-    },
-    refetchOnWindowFocus: false,
-  });
-
-  useQuery({
-    queryKey: ["obtainRoles"],
-    queryFn: async () => {
-      const userRepo = new UserRepositoryImp();
-      const tokenStorageRepo = new TokenStorageRepositoryImp();
-
-      const servicio = new UserService(userRepo, tokenStorageRepo);
-      const reqRoles = await servicio.getRoles();
-      useRolesStore.getState().setRoles(reqRoles.data || []);
-      return reqRoles;
     },
     refetchOnWindowFocus: false,
   });

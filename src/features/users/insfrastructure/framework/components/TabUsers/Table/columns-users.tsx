@@ -2,10 +2,11 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import type { UserEntity } from "@/features/users/domain/entities/UserEntity";
 import type { ColumnDef } from "@tanstack/react-table";
-import { EyeIcon, PencilIcon } from "lucide-react";
+import { PencilIcon, Trash2Icon } from "lucide-react";
 
 export const columnsUsers = (
-  onEdit: (user: UserEntity) => void
+  onEdit?: (user: UserEntity) => void,
+  onDelete?: (user: UserEntity) => void
 ): ColumnDef<UserEntity>[] => [
   {
     header: "N°",
@@ -17,10 +18,10 @@ export const columnsUsers = (
   { accessorKey: "email", header: "Correo Electronico" },
   {
     header: "Estado",
-    accessorKey: "active",
+    accessorKey: "enabled",
     cell: ({ getValue }) => {
-      const isActive = getValue();
-      return isActive ? (
+      const enabled = getValue();
+      return enabled ? (
         <Badge className="bg-green-600">Activo</Badge>
       ) : (
         <Badge variant={"destructive"}>Inactivo</Badge>
@@ -59,7 +60,7 @@ export const columnsUsers = (
             variant="outline"
             size="icon"
             className="shadow-sm cursor-pointer"
-            onClick={() => onEdit(row.original)}
+            onClick={() => onEdit && onEdit(row.original)}
           >
             <PencilIcon className="text-green-700" />
           </Button>
@@ -67,8 +68,11 @@ export const columnsUsers = (
             variant="outline"
             size="icon"
             className="shadow-sm cursor-pointer"
+            onClick={() => {
+              onDelete && onDelete(row.original);
+            }}
           >
-            <EyeIcon className="text-blue-500" />
+            <Trash2Icon className="text-red-500" />
           </Button>
         </div>
       );
