@@ -27,7 +27,7 @@ import { TokenStorageRepositoryImp } from "@/features/core/infrastructure/TokenS
 import { UserService } from "@/features/users/application/UserService";
 import { Switch } from "@/components/ui/switch";
 import { editUserSchema } from "../../../schemas/editUserSchema";
-import type { NewUserEntity } from "@/features/users/domain/entities/NewUserEntity";
+import type { NewUserEntity } from "@/features/users/domain/entities/temp";
 
 export default function ModalEditUser({
   open,
