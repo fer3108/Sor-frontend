@@ -1,9 +1,9 @@
-import type { RoleDTO } from "./EditRoleDto";
+import type { EditRoleDTO } from "./EditRoleDto";
 
 export interface UserDto {
   id: string;
   username: string;
   email: string;
   active: boolean;
-  roles: RoleDTO[];
+  roles: EditRoleDTO[];
 }
