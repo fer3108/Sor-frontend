@@ -5,7 +5,7 @@ import type { RoleEntity } from "../entities/RoleEntity";
 import type { PermissionEntity } from "../entities/PermissionEntity";
 import type { EditRoleEntity } from "../entities/EditRoleEntity";
 import type { NewRoleEntity } from "../entities/NewRoleEntity";
-import type { NewUserEntity } from "../entities/temp";
+import type { NewUserEntity } from "../entities/NewUserEntity";
 
 export interface UserRepository {
   // getUserById(id: string): Promise<User>;

@@ -7,7 +7,7 @@ import type { PermissionEntity } from "../../domain/entities/PermissionEntity";
 import adapterRoleDtoToApi from "../adapters/adapterRoleDtoToApi";
 import type { EditRoleEntity } from "../../domain/entities/EditRoleEntity";
 import type { NewRoleEntity } from "../../domain/entities/NewRoleEntity";
-import type { NewUserEntity } from "../../domain/entities/temp";
+import type { NewUserEntity } from "../../domain/entities/NewUserEntity";
 
 export class UserRepositoryImp implements UserRepository {
   private readonly baseUrl: string;
