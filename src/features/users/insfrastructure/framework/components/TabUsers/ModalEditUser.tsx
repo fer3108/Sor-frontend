@@ -15,7 +15,6 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import type { ApiResponseEntity } from "@/features/core/domain/entities/ApiResponse.entity";
 import { useRolesStore } from "@/features/core/infrastructure/stores/useRolesStore";
-import type { NewUserEntity } from "@/features/users/domain/entities/NewUserEntity";
 import type { RoleEntity } from "@/features/users/domain/entities/RoleEntity";
 import type { UserEntity } from "@/features/users/domain/entities/UserEntity";
 import { useForm } from "@tanstack/react-form";
@@ -28,6 +27,7 @@ import { TokenStorageRepositoryImp } from "@/features/core/infrastructure/TokenS
 import { UserService } from "@/features/users/application/UserService";
 import { Switch } from "@/components/ui/switch";
 import { editUserSchema } from "../../../schemas/editUserSchema";
+import type { NewUserEntity } from "@/features/users/domain/entities/NewUserEntity";
 
 export default function ModalEditUser({
   open,
