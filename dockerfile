@@ -3,6 +3,8 @@ FROM node:22-alpine AS build
 WORKDIR /app
 COPY package.json yarn.lock* package-lock.json* ./
 RUN npm install
+ARG API_URL
+ENV VITE_API_URL_V1=${API_URL}
 COPY . .
 RUN npm run build
 
