@@ -15,10 +15,8 @@ import {
 } from "@/components/ui/sidebar";
 import {
   ChevronDown,
-  FileSearch,
   GalleryVerticalEnd,
   LayoutDashboard,
-  Plus,
   User,
   UserPlus,
 } from "lucide-react";
@@ -47,41 +45,14 @@ const menuContent = [
     link: "/user",
   },
   {
-    name: "Usuarios",
+    name: "Operaciones",
     icon: UserPlus,
-    submenu: [
-      {
-        name: "Crear Usuario",
-        icon: Plus,
-        link: "/routeFive",
-      },
-      {
-        name: "Crear Rol",
-        icon: FileSearch,
-        link: "/role",
-      },
-      {
-        name: "Crear Permiso",
-        icon: FileSearch,
-        link: "/permission",
-      },
-    ],
+    link: "/operations",
   },
   {
-    name: "WhitSubmenu 2",
+    name: "Recurso 1",
     icon: UserPlus,
-    submenu: [
-      {
-        name: "menuButton 1",
-        icon: Plus,
-        link: "/routeFive",
-      },
-      {
-        name: "menuButton 2",
-        icon: FileSearch,
-        link: "/routeSix",
-      },
-    ],
+    link: "otro recurso",
   },
 ];
 
@@ -135,65 +106,23 @@ export default function RootLayout() {
         <SidebarContent className="p-4">
           <SidebarGroup>
             <SidebarMenu>
-              {menuContent.map((item, index) =>
-                item.submenu ? (
-                  <SidebarMenuItem key={index}>
-                    <Collapsible className="w-full">
-                      <CollapsibleTrigger className="w-full" asChild>
-                        <SidebarMenuButton
-                          isActive={location.pathname.startsWith("/personal")}
-                          className={`font-medium ${
-                            location.pathname.startsWith("/personal")
-                              ? "relative after:absolute after:left-0 after:top-0 after:h-full after:w-1 after:rounded-l-md after:bg-primary"
-                              : ""
-                          }`}
-                        >
-                          <UserPlus
-                            className={`mr-2 ${
-                              location.pathname.startsWith("/crearpersonal")
-                                ? "text-primary"
-                                : ""
-                            }`}
-                          />
-                          {item.name}
-                          <ChevronDown className="ml-auto h-4 w-4 shrink-0 transition-transform duration-200 group-data-[state=open]:rotate-180" />
-                        </SidebarMenuButton>
-                      </CollapsibleTrigger>
-                      <CollapsibleContent>
-                        <SidebarMenuSub className="">
-                          {item.submenu.map((item, index) => (
-                            <SidebarMenuSubItem key={index}>
-                              <SidebarMenuSubButton
-                                asChild
-                                isActive={location.pathname === item.link}
-                              >
-                                <Link
-                                  to={item.link || "#"}
-                                  className="hover:[&>svg]:text-white data-[active=true]:[&>svg]:text-white"
-                                >
-                                  <item.icon className="mr-2 h-4 w-4" />
-                                  {item.name}
-                                </Link>
-                              </SidebarMenuSubButton>
-                            </SidebarMenuSubItem>
-                          ))}
-                        </SidebarMenuSub>
-                      </CollapsibleContent>
-                    </Collapsible>
-                  </SidebarMenuItem>
-                ) : (
-                  <SidebarMenuItem key={index}>
-                    <SidebarMenuButton
-                      asChild
-                      isActive={location.pathname === item.link}
-                    >
-                      <Link to={item.link || "#"} className="w-full">
-                        <item.icon />
-                        <span className="text-sm font-medium">{item.name}</span>
-                      </Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                )
+              {menuContent.map(
+                (item, index) =>
+                  item.link && (
+                    <SidebarMenuItem key={index}>
+                      <SidebarMenuButton
+                        asChild
+                        isActive={location.pathname === item.link}
+                      >
+                        <Link to={item.link} className="w-full">
+                          <item.icon />
+                          <span className="text-sm font-medium">
+                            {item.name}
+                          </span>
+                        </Link>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  )
               )}
             </SidebarMenu>
           </SidebarGroup>
