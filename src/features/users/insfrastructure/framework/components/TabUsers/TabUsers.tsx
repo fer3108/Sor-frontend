@@ -1,10 +1,10 @@
-import { columnsUsers } from "./TabUsers/Table/columns-users";
 import { useState } from "react";
-import ModalEditUser from "./TabUsers/ModalEditUser";
-import ModalNewUser from "./TabUsers/ModalNewUser";
-import { TableUsers } from "./TabUsers/Table/TableUsers";
-import ModalDeleteUser from "./TabUsers/ModalDeleteUser";
 import type { UserEntity } from "@/features/users/domain/entities/UserEntity";
+import ModalNewUser from "./ModalNewUser";
+import { TableUsers } from "./Table/TableUsers";
+import ModalEditUser from "./ModalEditUser";
+import ModalDeleteUser from "./ModalDeleteUser";
+import { columnsUsers } from "./Table/columns-users";
 
 export default function TabUsers({ dataTable }: { dataTable: any }) {
   const [selectedUser, setSelectedUser] = useState<UserEntity | null>(null);

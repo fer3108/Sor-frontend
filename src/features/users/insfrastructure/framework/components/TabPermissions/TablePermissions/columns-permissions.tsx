@@ -1,5 +1,7 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
 import type { PermissionEntity } from "@/features/users/domain/entities/PermissionEntity";
 import type { ColumnDef } from "@tanstack/react-table";
 import { PencilIcon, Trash2Icon } from "lucide-react";
@@ -17,6 +19,19 @@ export const columnsPermissions = (
   { accessorKey: "name", header: "Nombre Permiso" },
   { accessorKey: "description", header: "Descripción" },
   {
+    header: "Acciones",
+    cell: ({ row }) => {
+      return (
+        <div className="flex gap-2 w-full">
+          <Badge variant={"outline"}>Crear</Badge>
+          <Badge variant={"outline"}>Listar</Badge>
+          <Badge variant={"outline"}>Actualizar</Badge>
+          <Badge variant={"outline"}>Eliminar</Badge>
+        </div>
+      );
+    },
+  },
+  {
     header: "Estado",
     accessorKey: "enabled",
     cell: ({ getValue }) => {
@@ -31,7 +46,7 @@ export const columnsPermissions = (
     },
   },
   {
-    header: "Acciones",
+    header: " ",
     cell: ({ row }) => {
       return (
         <div className="flex gap-2 w-fit">
